@@ -28,7 +28,7 @@ public class Survey {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "surveyid")
-    private List<Email> emails;
+    private List<Emails> emails;
 
 
 }

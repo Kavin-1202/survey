@@ -11,6 +11,7 @@ import com.ust.Survey_api.model.Survey;
 import com.ust.Survey_api.repository.EmailRepository;
 import com.ust.Survey_api.repository.SurveyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,13 +34,15 @@ public class ServiceImpl  implements  SurveyService{
 
     @Autowired
     private EmailRepository emailRepository;
+    @Value("${survey.expire.time.days}")
+    private int expireTimeDays;
 
     @Override
     public FullResponse addSurvey(SurveyRequestDto survey) {
         FullResponse fr = new FullResponse();
         fr.setRequestor(survey.getRequestor());
         fr.setCreatedTime(LocalDate.now());
-        fr.setExpireTime((LocalDate.now()).plus(30, ChronoUnit.DAYS));
+        fr.setExpireTime((LocalDate.now()).plus(expireTimeDays, ChronoUnit.DAYS));
         fr.setSetId(survey.getSetid());
         fr.setCompanyName(survey.getCompanyName());
         List<SetNameDto> optionalSetData = null;
@@ -55,7 +58,7 @@ public class ServiceImpl  implements  SurveyService{
         s.setRequestor(survey.getRequestor());
         s.setSetid(survey.getSetid());
         s.setCreatedTime(LocalDate.now());
-        s.setExpireTime((LocalDate.now()).plus(30, ChronoUnit.DAYS));
+        s.setExpireTime((LocalDate.now()).plus(expireTimeDays, ChronoUnit.DAYS));
         s.setCompanyName(survey.getCompanyName());
         Survey se= repo.save(s);
         fr.setSurveyid(se.getSurveyid());
@@ -113,7 +116,7 @@ public class ServiceImpl  implements  SurveyService{
             for (String email : emails) {
                 Email e = new Email();
                 e.setEmail(email);
-                e.setSurveyid(surveyid);
+     4           e.setSurveyid(surveyid);
                 e.setStatus(Status.PENDING);
                 emailList.add(e);
             }
