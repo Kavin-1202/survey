@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "email")
+@Table(name = "surveyDetails")
 public class Emails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

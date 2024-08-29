@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "dashboard")
+@Table(name = "survey")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Survey {
@@ -20,11 +20,11 @@ public class Survey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long surveyid;
+    private long id;
     private String requestor;
     private String companyName;
     private Long setid;
-    private LocalDate createdTime;
-    private LocalDate expireTime;
+    private LocalDate createdDate;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "surveyid")

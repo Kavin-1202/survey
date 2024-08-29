@@ -2,9 +2,10 @@ package com.ust.Survey_api.controller;
 
 import com.ust.Survey_api.exception.SetNotFoundException;
 import com.ust.Survey_api.feign.FullResponse;
+import com.ust.Survey_api.feign.PostDto;
 import com.ust.Survey_api.feign.SetNameDto;
 import com.ust.Survey_api.feign.SurveyRequestDto;
-import com.ust.Survey_api.model.Email;
+import com.ust.Survey_api.model.Emails;
 import com.ust.Survey_api.model.Survey;
 import com.ust.Survey_api.repository.SurveyRepository;
 import com.ust.Survey_api.service.SurveyService;
@@ -28,8 +29,8 @@ public class SurveyController {
     private SurveyRepository surveyRepository;
 
     @PostMapping("/survey")
-    public ResponseEntity<FullResponse> addSurvey(@RequestBody SurveyRequestDto survey) {
-       FullResponse surveyResponse = surveyService.addSurvey(survey);
+    public ResponseEntity<PostDto> addSurvey(@RequestBody SurveyRequestDto survey) {
+       PostDto surveyResponse = surveyService.addSurvey(survey);
         if (surveyResponse == null) {
             throw new SetNotFoundException("Set name not found.");
         }
@@ -52,7 +53,7 @@ public class SurveyController {
 
 
     @PostMapping("/survey/{surveyid}/addEmails")
-    public ResponseEntity<List<Email>> addEmails(@PathVariable Long surveyid, @RequestBody List<String> emails) {
+    public ResponseEntity<List<Emails>> addEmails(@PathVariable Long surveyid, @RequestBody List<String> emails) {
         Survey survey = surveyRepository.findBySurveyid(surveyid);
         if (survey == null) {
             throw new SetNotFoundException(" surveyId not found");
@@ -61,7 +62,7 @@ public class SurveyController {
     }
 
     @GetMapping("/survey/{surveyid}/emails")
-    public ResponseEntity<List<Email>> getEmails(@PathVariable Long surveyid) {
+    public ResponseEntity<List<Emails>> getEmails(@PathVariable Long surveyid) {
         Survey survey = surveyRepository.findBySurveyid(surveyid);
         if (survey == null) {
             throw new SetNotFoundException("surveyId not found");

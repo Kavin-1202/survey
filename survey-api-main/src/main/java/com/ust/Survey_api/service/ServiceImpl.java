@@ -1,11 +1,8 @@
 package com.ust.Survey_api.service;
 
 import com.ust.Survey_api.exception.SetNotFoundException;
-import com.ust.Survey_api.feign.AssessmentClient;
-import com.ust.Survey_api.feign.FullResponse;
-import com.ust.Survey_api.feign.SetNameDto;
-import com.ust.Survey_api.feign.SurveyRequestDto;
-import com.ust.Survey_api.model.Email;
+import com.ust.Survey_api.feign.*;
+import com.ust.Survey_api.model.Emails;
 import com.ust.Survey_api.model.Status;
 import com.ust.Survey_api.model.Survey;
 import com.ust.Survey_api.repository.EmailRepository;
@@ -25,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ServiceImpl  implements  SurveyService{
 
     private static final AtomicLong counter = new AtomicLong(0);
-
+    private static LocalDate expireDate;
     @Autowired
     private AssessmentClient client;
 
@@ -38,11 +35,12 @@ public class ServiceImpl  implements  SurveyService{
     private int expireTimeDays;
 
     @Override
-    public FullResponse addSurvey(SurveyRequestDto survey) {
-        FullResponse fr = new FullResponse();
+    public PostDto addSurvey(SurveyRequestDto survey) {
+        PostDto fr = new PostDto();
+        long id = counter.incrementAndGet();
+        fr.setId(id);
         fr.setRequestor(survey.getRequestor());
-        fr.setCreatedTime(LocalDate.now());
-        fr.setExpireTime((LocalDate.now()).plus(expireTimeDays, ChronoUnit.DAYS));
+        fr.setCreatedDate(LocalDate.now());
         fr.setSetId(survey.getSetid());
         fr.setCompanyName(survey.getCompanyName());
         List<SetNameDto> optionalSetData = null;
@@ -54,11 +52,11 @@ public class ServiceImpl  implements  SurveyService{
         }
 
         Survey s = new Survey();
-        s.setSurveyid(survey.getSurveyid());
+//        s.setSurveyid(survey.getSurveyid());
         s.setRequestor(survey.getRequestor());
         s.setSetid(survey.getSetid());
-        s.setCreatedTime(LocalDate.now());
-        s.setExpireTime((LocalDate.now()).plus(expireTimeDays, ChronoUnit.DAYS));
+        s.setCreatedDate(LocalDate.now());
+        expireDate=(LocalDate.now().plus(expireTimeDays, ChronoUnit.DAYS));
         s.setCompanyName(survey.getCompanyName());
         Survey se= repo.save(s);
         fr.setSurveyid(se.getSurveyid());
@@ -77,12 +75,12 @@ public class ServiceImpl  implements  SurveyService{
         }
         for (Survey survey : surveys) {
             FullResponse fr = new FullResponse();
-            //long id = counter.incrementAndGet();
+            fr.setId(survey.getId());
             fr.setSurveyid(survey.getSurveyid());
             fr.setRequestor(survey.getRequestor());
             fr.setSetId(survey.getSetid());
-            fr.setCreatedTime(survey.getCreatedTime());
-            fr.setExpireTime(survey.getExpireTime());
+            fr.setCreatedDate(survey.getCreatedDate());
+            fr.setExpireDate(expireDate);
             fr.setCompanyName(survey.getCompanyName());
             List<SetNameDto> dtos = client.getSet(survey.getSetid()).getBody();
             fr.setSetdata(dtos);
@@ -100,23 +98,26 @@ public class ServiceImpl  implements  SurveyService{
         if(survey == null){
             throw new SetNotFoundException("Invalid survey id");
         }
+        fr.setId(survey.getId());
         fr.setSurveyid(survey.getSurveyid());
         fr.setRequestor(survey.getRequestor());
         fr.setSetId(survey.getSetid());
         fr.setCompanyName(survey.getCompanyName());
+        fr.setCreatedDate(survey.getCreatedDate());
+        fr.setExpireDate(expireDate);
         List<SetNameDto> dtos = client.getSet(survey.getSetid()).getBody();
         fr.setSetdata(dtos);
         return fr;
     }
 
     @Override
-    public List<Email> addEmails(Long surveyid, List<String> emails) {
+    public List<Emails> addEmails(Long surveyid, List<String> emails) {
         try {
-            List<Email> emailList = new ArrayList<Email>();
+            List<Emails> emailList = new ArrayList<Emails>();
             for (String email : emails) {
-                Email e = new Email();
+                Emails e = new Emails();
                 e.setEmail(email);
-     4           e.setSurveyid(surveyid);
+                e.setSurveyid(surveyid);
                 e.setStatus(Status.PENDING);
                 emailList.add(e);
             }
@@ -132,8 +133,8 @@ public class ServiceImpl  implements  SurveyService{
     }
 
     @Override
-    public List<Email> getEmails(Long surveyid) {
-        List<Email> e = null;
+    public List<Emails> getEmails(Long surveyid) {
+        List<Emails> e = null;
         try{
             e = emailRepository.findBySurveyid(surveyid);
 

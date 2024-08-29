@@ -1,6 +1,5 @@
 package com.ust.Survey_api.feign;
 
-import com.ust.Survey_api.model.Email;
 import com.ust.Survey_api.model.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,11 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class SurveyRequestDto {
 
-    private Long surveyid;
     private String requestor;
     private String companyName;
     private Long setid;
-
-
 
 }
